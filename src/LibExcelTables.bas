@@ -27,6 +27,14 @@ Attribute VB_Name = "LibExcelTables"
 ''' IN THE SOFTWARE.
 '''=============================================================================
 
+'*******************************************************************************
+'' Public/Exposed methods:
+''    - AddListRows
+''    - DeleteListRows
+''    - GetListObject
+''    - IsListObjectFiltered
+'*******************************************************************************
+
 Option Explicit
 Option Private Module
 
