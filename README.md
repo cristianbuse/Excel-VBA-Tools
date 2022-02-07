@@ -7,8 +7,8 @@ Useful libraries for Excel VBA:
    - ```IsListObjectFiltered```: check if table is filtered without the need for error handling
  - [LibExcelBookItems.bas](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/LibExcelBookItems.bas)  
    Store/retrieve```String``` items in a ```Workbook``` using encapsulated custom XML functionality. No need to write any XML.
-     - ```BookItem```: parametric property Get/Let
-     - ```GetBookItemNames```: retrieve a collection of all item names. To delete a property simply set the value to a null string e.g. BookItem(ThisWorkbook, "itemName") = vbNullString
+     - ```BookItem```: parametric property Get/Let. To delete a property simply set the value to a null string e.g. BookItem(ThisWorkbook, "itemName") = vbNullString
+     - ```GetBookItemNames```: retrieve a collection of all item names
 ## License
 MIT License
 
