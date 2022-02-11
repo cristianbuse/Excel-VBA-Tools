@@ -9,6 +9,22 @@ Useful libraries for Excel VBA:
    Store/retrieve```String``` items in a ```Workbook``` using encapsulated custom XML functionality. No need to write any XML.
      - ```BookItem```: parametric property Get/Let. To delete a property simply set the value to a null string e.g. BookItem(ThisWorkbook, "itemName") = vbNullString
      - ```GetBookItemNames```: retrieve a collection of all item names
+	 
+## Submodules
+Some of the modules in this repository require some additional library code modules which are available in the [submodules folder](https://github.com/cristianbuse/Excel-VBA-Tools/tree/master/submodules) or you can get their latest version here:  
+* [LibMemory](https://github.com/cristianbuse/VBA-MemoryTools/blob/master/src/LibMemory.bas)
+
+Note that submodules are not available in the Zip download. If cloning via GitHub Desktop the submodules will be pulled automatically by default. If cloning via Git Bash then use something like:
+```
+$ git clone https://github.com/cristianbuse/Excel-VBA-Tools
+$ git submodule init
+$ git submodule update
+```
+or:
+```
+$ git clone --recurse-submodules https://github.com/cristianbuse/Excel-VBA-Tools
+```	 
+	 
 ## License
 MIT License
 
