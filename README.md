@@ -12,6 +12,7 @@ Useful libraries for Excel VBA:
  - [ExcelTable.cls](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/ExcelTable.cls)  
    Easy storage of tabular data in Excel within a single class.
    Requires the ```LibMemory``` submodule - see the [Submodules](#submodules) section below
+
    Can be initialized via:
      - ```InitFromListObject```: 1 row headers always non-blank and unique
      - ```InitFromRange```: joins multi header rows and makes them unique using the same strategy as a ListObject
