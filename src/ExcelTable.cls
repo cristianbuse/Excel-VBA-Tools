@@ -113,10 +113,12 @@ Private Sub LockDataSize()
     Const FADF_HAVEVARTYPE As Long = &H80
     Const F_STATIC As Long = FADF_HAVEVARTYPE Or FADF_FIXEDSIZE Or FADF_STATIC
     '
-    LibMemory.MemInt(LibMemory.ArrPtr(m_data) + 2) = F_STATIC
+    If Me.RowsCount > 0 Then
+        LibMemory.MemInt(LibMemory.ArrPtr(m_data) + 2) = F_STATIC
+    End If
 End Sub
 Private Sub UnlockDataSizeIfNeeded()
-    If Me.RowCount > 0 Then
+    If Me.RowsCount > 0 Then
         Const FADF_HAVEVARTYPE As Long = &H80
         LibMemory.MemInt(LibMemory.ArrPtr(m_data) + 2) = FADF_HAVEVARTYPE
     End If
@@ -192,7 +194,7 @@ Public Sub InitFromRange(ByVal rng As Range _
     '
     Dim tempHeaders() As Variant
     Dim nonDataRows As Long
-    Dim rowsCount As Long
+    Dim rCount As Long
     Dim rngData As Range
     '
     CleanHeaders(tempHeaders) = rng.Resize(RowSize:=headerRowsCount)
@@ -201,9 +203,9 @@ Public Sub InitFromRange(ByVal rng As Range _
     InitHeaderCollection m_headers
     '
     nonDataRows = headerRowsCount + dataRowsToIgnore
-    rowsCount = rng.Rows.Count - nonDataRows
-    If rowsCount > 0 Then
-        Set rngData = rng.Resize(RowSize:=rowsCount).Offset(nonDataRows)
+    rCount = rng.Rows.Count - nonDataRows
+    If rCount > 0 Then
+        Set rngData = rng.Resize(RowSize:=RowsCount).Offset(nonDataRows)
     End If
     UnlockDataSizeIfNeeded
     CleanData(m_data) = rngData
@@ -451,9 +453,9 @@ End Property
 '===============================================================================
 'Rows Count
 '===============================================================================
-Public Property Get RowCount() As Long
+Public Property Get RowsCount() As Long
     On Error Resume Next
-    RowCount = UBound(m_data, 1) - LBound(m_data, 1) + 1
+    RowsCount = UBound(m_data, 1) - LBound(m_data, 1) + 1
     On Error GoTo 0
 End Property
 
