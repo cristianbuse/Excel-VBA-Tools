@@ -82,7 +82,7 @@ End Sub
 'Node is created if missing!
 '*******************************************************************************
 Private Function GetRootNode(ByVal book As Workbook) As CustomXMLNode
-    Static root As CustomXMLNode
+    Dim root As CustomXMLNode
     If root Is Nothing Then
         With GetRootXMLPart(book)
             Dim nsPrefix As String
