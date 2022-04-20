@@ -24,7 +24,7 @@ Useful libraries for Excel VBA:
      - ```HeadersArray```: a copy of the internal headers array
 
    Has the following utilities:
-     - ```ColumnsCount```: returns the nummber of headers/columns
+     - ```ColumnsCount```: returns the number of headers/columns
      - ```HeaderAtIndex```: returns the header string at a given index
      - ```HeaderExists```: checks if a header string exists
      - ```IndexForHeader```: returns the index for a header string
