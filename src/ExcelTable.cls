@@ -73,6 +73,45 @@ Private Sub Class_Terminate()
 End Sub
 
 '*******************************************************************************
+'Init from already built arrays of headers and data
+'*******************************************************************************
+Public Sub InitFromArrays(ByRef arrHeaders As Variant _
+                        , ByRef arrData As Variant)
+    Const methodName As String = "InitFromArrays"
+    If GetArrayDimsCount(arrHeaders) <> 2 Then
+        Err.Raise 91, TypeName(Me) & "." & methodName, "Expected 2D headers"
+    ElseIf GetArrayDimsCount(arrData) <> 2 Then
+        Err.Raise 91, TypeName(Me) & "." & methodName, "Expected 2D data"
+    ElseIf UBound(arrHeaders, 1) <> LBound(arrHeaders, 1) Then
+        Err.Raise 91, TypeName(Me) & "." & methodName, "Expected 1 row headers"
+    ElseIf LBound(arrHeaders, 2) <> LBound(arrData, 2) _
+        Or UBound(arrHeaders, 2) <> UBound(arrData, 2) Then
+        Err.Raise 91, TypeName(Me) & "." & methodName, "Invalid column bounds"
+    End If
+    '
+    m_headers = arrHeaders
+    FixHeaderDuplicates m_headers
+    InitHeaderCollection m_headers
+    '
+    UnlockDataSizeIfNeeded
+    m_data = arrData
+    LockDataSize
+End Sub
+Private Function GetArrayDimsCount(ByRef arr As Variant) As Long
+    Const MAX_DIMENSION As Long = 60
+    Dim dimension As Long
+    Dim tempBound As Long
+    '
+    On Error GoTo FinalDimension
+    For dimension = 1 To MAX_DIMENSION
+        tempBound = LBound(arr, dimension)
+    Next dimension
+Exit Function
+FinalDimension:
+    GetArrayDimsCount = dimension - 1
+End Function
+
+'*******************************************************************************
 'A ListObject header/column names are never blank and are always unique
 '*******************************************************************************
 Public Sub InitFromListObject(ByVal tbl As ListObject)
@@ -95,7 +134,7 @@ Private Property Let RangeValues(ByRef arr() As Variant, ByVal rng As Range)
         On Error Resume Next
         Erase arr
         On Error GoTo 0
-    ElseIf rng.Count = 1 Then
+    ElseIf rng.Cells.Count = 1 Then
         ReDim arr(1 To 1, 1 To 1) As Variant
         arr(1, 1) = rng.Value2
     Else
@@ -129,12 +168,13 @@ End Sub
 '*******************************************************************************
 Private Sub InitHeaderCollection(ByRef arr() As Variant)
     Dim headerName As Variant
-    Dim i As Long: i = 0
+    Dim i As Long
     '
     If m_headersColl.Count > 0 Then Set m_headersColl = New Collection
+    i = LBound(arr, 1)
     For Each headerName In arr
-        i = i + 1
         m_headersColl.Add i, headerName
+        i = i + 1
     Next headerName
 End Sub
 
@@ -205,7 +245,7 @@ Public Sub InitFromRange(ByVal rng As Range _
     nonDataRows = headerRowsCount + dataRowsToIgnore
     rCount = rng.Rows.Count - nonDataRows
     If rCount > 0 Then
-        Set rngData = rng.Resize(RowSize:=RowsCount).Offset(nonDataRows)
+        Set rngData = rng.Resize(RowSize:=rCount).Offset(nonDataRows)
     End If
     UnlockDataSizeIfNeeded
     CleanData(m_data) = rngData
