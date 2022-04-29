@@ -30,6 +30,16 @@ Useful libraries for Excel VBA:
      - ```IndexForHeader```: returns the index for a header string
      - ```RowsCount```: returns the number of data rows
      - ```Self```: returns the instance
+ - [ExcelAppState.cls](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/ExcelAppState.cls)  
+   This class is useful to store/modify/restore application settings in order to speed up code execution when interacting with certain parts of the application. The first section of [this CR answer](https://codereview.stackexchange.com/questions/254730/copy-a-contiguous-sub-column-of-cells/255006#255006) explains why this class/approach is needed.
+
+   Has the following utilities:
+     - ```StoreState```: stores the current state for a couple of application settings
+     - ```RestoreState```: restores the state as it was saved via the ```StoreState``` method
+     - ```Sleep```: turns a few application settings off but has the ability to keep some/all of them on via the optional parameters
+     - ```Wake```: turns a few application settings on but has the ability to keep some/all of them off via the optional parameters
+     - ```WaitForCalculations```: waits for the ```Application.CalculationState``` to be equal to ```xlDone``` and even fixes a bug that occurs when volatile formulas are present. The ```maxMilliSecondsToWait``` parameter allows the user to define a timeout period in case the calculation takes too long/is stuck
+     - ```ClearStateIfNeeded``` clears the saved state (if any) so that ```RestoreState``` is not called on instance termination. Rarely needed
 	 
 ## Submodules
 Some of the modules in this repository require some additional library code modules which are available in the [submodules folder](https://github.com/cristianbuse/Excel-VBA-Tools/tree/master/submodules) or you can get their latest version here:  
