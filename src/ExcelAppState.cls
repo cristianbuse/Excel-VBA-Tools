@@ -94,13 +94,13 @@ Public Sub RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0)
     End If
     With Application
         If .EnableEvents Xor m_eventOn Then .EnableEvents = m_eventOn
+        If .ScreenUpdating Xor m_repaintOn Then .ScreenUpdating = m_repaintOn
         If m_hasStoredCalcMode Then
             On Error Resume Next
             If .Calculation <> m_calcMode Then .Calculation = m_calcMode
             If Err.Number = 0 Then WaitForCalculations maxMilliSecondsToWait
             On Error GoTo 0
         End If
-        If .ScreenUpdating Xor m_repaintOn Then .ScreenUpdating = m_repaintOn
         If .DisplayAlerts Xor m_alertsOn Then .DisplayAlerts = m_alertsOn
         If .PrintCommunication Xor m_printOn Then .PrintCommunication = m_printOn
     End With
@@ -154,11 +154,11 @@ Public Sub Wake(Optional ByVal maxMilliSecondsToWait As Long = 0 _
     End Select
     With Application
         If .EnableEvents Xor eventsOn Then .EnableEvents = eventsOn
+        If .ScreenUpdating Xor repaintOn Then .ScreenUpdating = repaintOn
         On Error Resume Next
         If .Calculation <> calcMode Then .Calculation = calcMode
         If Err.Number = 0 Then WaitForCalculations maxMilliSecondsToWait
         On Error GoTo 0
-        If .ScreenUpdating Xor repaintOn Then .ScreenUpdating = repaintOn
         If .DisplayAlerts Xor alertsOn Then .DisplayAlerts = alertsOn
         If .PrintCommunication Xor printOn Then .PrintCommunication = printOn
     End With
