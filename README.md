@@ -41,6 +41,15 @@ Useful libraries for Excel VBA:
      - ```WaitForCalculations```: waits for the ```Application.CalculationState``` to be equal to ```xlDone``` and even fixes a bug that occurs when volatile formulas are present. The ```maxMilliSecondsToWait``` parameter allows the user to define a timeout period in case the calculation takes too long/is stuck
      - ```ClearStateIfNeeded``` clears the saved state (if any) so that ```RestoreState``` is not called on instance termination. Rarely needed
 	 
+ - [BookConnection.cls](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/BookConnection.cls)  
+   This class is useful for opening workbooks or just accessing them if they are already opened. The open state is stored and books that were opened are closed when ```Disconnect``` is called.
+
+   Has the following utilities:
+     - ```Connect```: opens a workbook by full path or retrieves a book that is already opened. The open state is saved
+     - ```Disconnect```: closes a book that was opened with ```Connect``` or does nothing if the book was already open when ```Connect``` was called
+     - ```Self```: returns the instance
+     - ```Workbook```: returns the workbook object that was specified when ```Connect``` was called
+	 
 ## Submodules
 Some of the modules in this repository require some additional library code modules which are available in the [submodules folder](https://github.com/cristianbuse/Excel-VBA-Tools/tree/master/submodules) or you can get their latest version here:  
 * [LibMemory](https://github.com/cristianbuse/VBA-MemoryTools/blob/master/src/LibMemory.bas)
