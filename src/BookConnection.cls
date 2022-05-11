@@ -62,7 +62,7 @@ Public Function Connect(ByVal filePath As String _
                       , Optional ByVal updateLinks As Boolean = False _
                       , Optional ByVal readOnly As Boolean = True _
                       , Optional ByVal password As String _
-                      , Optional ByVal hideNewlyOpened As Boolean = True _
+                      , Optional ByVal minimizeNewlyOpened As Boolean = True _
 ) As Boolean
     Disconnect 'Just in case 'Connect' was called before
     '
@@ -76,9 +76,9 @@ Public Function Connect(ByVal filePath As String _
                               , password:=password)
     If Not m_book Is Nothing Then
         m_alreadyOpened = (bookCount = Workbooks.Count)
-        If Not m_alreadyOpened And hideNewlyOpened Then
+        If Not m_alreadyOpened And minimizeNewlyOpened Then
             For Each wnd In m_book.Windows
-                wnd.Visible = False
+                wnd.WindowState = xlMinimized
             Next wnd
         End If
         Connect = True
