@@ -5,6 +5,7 @@ Useful libraries for Excel VBA:
      - ```AddListRows```, ```DeleteListRows```: adds/deletes a variable number of ```ListRows``` to/from a ```ListObject``` and works even if the parent ```Worksheet``` is protected with the ```UserInterfaceOnly``` flag set to ```True``` without the need to unprotect. See related [SO answer](https://stackoverflow.com/a/70832694/8488913)
      - ```GetListObject```: retrieve table by name without the need to know the parent ```Worksheet```
      - ```IsListObjectFiltered```: check if table is filtered without the need for error handling
+     - ```SortListObjectIfNeeded```: sort a table only if needed. When sort is not needed, it is faster to iterate through values and not call the built-in sort method
  - [LibExcelBookItems.bas](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/LibExcelBookItems.bas)  
    Store/retrieve```String``` items in a ```Workbook``` using encapsulated custom XML functionality. No need to write any XML.
      - ```BookItem```: parametric property Get/Let. To delete a property simply set the value to a null string e.g. BookItem(ThisWorkbook, "itemName") = vbNullString

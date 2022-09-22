@@ -33,6 +33,7 @@ Attribute VB_Name = "LibExcelTables"
 ''    - DeleteListRows
 ''    - GetListObject
 ''    - IsListObjectFiltered
+''    - SortListObjectIfNeeded
 '*******************************************************************************
 
 Option Explicit
@@ -293,3 +294,57 @@ Public Function IsListObjectFiltered(targetTable As ListObject) As Boolean
     IsListObjectFiltered = targetTable.AutoFilter.FilterMode
     On Error GoTo 0
 End Function
+
+'*******************************************************************************
+'Sorts a table only if needed
+'*******************************************************************************
+Public Sub SortListObjectIfNeeded(ByVal tbl As ListObject _
+                                , ByVal sortColumn As Long _
+                                , ByVal sortOrder As XlSortOrder)
+    Const methodName As String = MODULE_NAME & ".SortListObjectIfNeeded"
+    If tbl Is Nothing Then
+        Err.Raise 91, methodName, "Table not set"
+    ElseIf sortColumn < 1 Or sortColumn > tbl.ListColumns.Count Then
+        Err.Raise 5, methodName, "Invalid sort column index"
+    End If
+    If tbl.ListRows.Count <= 1 Then Exit Sub 'Nothing to sort
+    '
+    Dim rngSort As Range:     Set rngSort = tbl.ListColumns(sortColumn).DataBodyRange
+    Dim arr() As Variant:     arr = rngSort.Value2
+    Dim sortAsc As Boolean:   sortAsc = (sortOrder = xlAscending)
+    Dim prev As Variant:      prev = arr(LBound(arr, 1), LBound(arr, 2))
+    Dim isPrevErr As Boolean: isPrevErr = IsError(prev)
+    Dim curr As Variant
+    Dim isCurrErr As Boolean
+    Dim needsSort As Boolean
+    '
+    For Each curr In arr
+        isCurrErr = IsError(curr)
+        If isCurrErr Then
+            If Not isPrevErr Then needsSort = Not sortAsc
+        ElseIf isPrevErr Then
+            needsSort = sortAsc
+        ElseIf sortAsc Then
+            needsSort = (prev > curr)
+        Else
+            needsSort = (prev < curr)
+        End If
+        If needsSort Then Exit For
+        isPrevErr = isCurrErr
+        prev = curr
+    Next curr
+    If Not needsSort Then Exit Sub
+    '
+    If IsListObjectFiltered(tbl) Then tbl.AutoFilter.ShowAllData
+    With tbl.Sort.SortFields
+        .Clear
+        .Add rngSort, xlSortOnValues, sortOrder, , xlSortNormal
+    End With
+    With tbl.Sort
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+End Sub
