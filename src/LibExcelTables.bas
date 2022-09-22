@@ -269,7 +269,7 @@ End Sub
 '*******************************************************************************
 Public Function GetListObject(ByVal tableName As String _
                             , ByVal sourceBook As Workbook) As ListObject
-    If tableName = vbNullString Or sourceBook Is Nothing Then Exit Function
+    If LenB(tableName) = 0 Or sourceBook Is Nothing Then Exit Function
     '
     Dim wSheet As Worksheet
     Dim tbl As ListObject
