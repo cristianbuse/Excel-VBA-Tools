@@ -75,6 +75,8 @@ Public Function AddListRows(ByVal tbl As ListObject _
     End If
     If startRow = 0 Then startRow = tbl.ListRows.Count + 1
     '
+    UnfilterIfNeeded tbl
+    '
     If startRow = tbl.ListRows.Count + 1 Then
         isSuccess = AppendListRows(tbl, rowsToAdd, doEntireSheetRow)
     Else
@@ -89,6 +91,16 @@ Public Function AddListRows(ByVal tbl As ListObject _
     End If
     Set AddListRows = tbl.ListRows(startRow).Range.Resize(RowSize:=rowsToAdd)
 End Function
+
+'*******************************************************************************
+'Utility for 'AddListRows' and 'DeleteListRows' methods
+'*******************************************************************************
+Private Sub UnfilterIfNeeded(ByVal tbl As ListObject)
+    On Error Resume Next
+    If IsListObjectFiltered(tbl) Then tbl.AutoFilter.ShowAllData
+    If tbl.Parent.AutoFilterMode Then tbl.Parent.AutoFilter.ShowAllData
+    On Error GoTo 0
+End Sub
 
 '*******************************************************************************
 'Utility for 'AddListRows' method
@@ -244,6 +256,8 @@ Public Sub DeleteListRows(ByVal tbl As ListObject _
         Err.Raise 5, fullMethodName, "Invalid start row"
     End If
     If startRow = 0 Then startRow = tbl.ListRows.Count - rowsToDelete + 1
+    '
+    UnfilterIfNeeded tbl
     '
     Dim rng As Range
     Set rng = tbl.ListRows(startRow).Range.Resize(RowSize:=rowsToDelete)
