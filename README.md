@@ -25,11 +25,11 @@ Useful libraries for Excel VBA:
      - ```HeadersArray```: a copy of the internal headers array
 
    Has the following utilities:
-     - ```ColumnsCount```: returns the number of headers/columns
+     - ```ColumnCount```: returns the number of headers/columns
      - ```HeaderAtIndex```: returns the header string at a given index
      - ```HeaderExists```: checks if a header string exists
      - ```IndexForHeader```: returns the index for a header string
-     - ```RowsCount```: returns the number of data rows
+     - ```RowCount```: returns the number of data rows
      - ```Self```: returns the instance
  - [ExcelAppState.cls](https://github.com/cristianbuse/Excel-VBA-Tools/blob/master/src/ExcelAppState.cls)  
    This class is useful to store/modify/restore application settings in order to speed up code execution when interacting with certain parts of the application. The first section of [this CR answer](https://codereview.stackexchange.com/questions/254730/copy-a-contiguous-sub-column-of-cells/255006#255006) explains why this class/approach is needed.

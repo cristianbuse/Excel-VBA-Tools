@@ -47,11 +47,11 @@ Attribute VB_Exposed = False
 ''    - DataByRef          - data array wrapped in a ByRef Variant to avoid copy
 ''    - HeadersArray       - a copy of the internal headers array
 '' Has the following utilities:
-''    - ColumnsCount       - returns the nummber of headers/columns
+''    - ColumnCount        - returns the nummber of headers/columns
 ''    - HeaderAtIndex      - returns the header string at a given index
 ''    - HeaderExists       - checks if a header string exists
 ''    - IndexForHeader     - returns the index for a header string
-''    - RowsCount          - returns the number of data rows
+''    - RowCount           - returns the number of data rows
 ''    - Self               - returns the instance
 ''==============================================================================
 
@@ -152,12 +152,12 @@ Private Sub LockDataSize()
     Const FADF_HAVEVARTYPE As Long = &H80
     Const F_STATIC As Long = FADF_HAVEVARTYPE Or FADF_FIXEDSIZE Or FADF_STATIC
     '
-    If Me.RowsCount > 0 Then
+    If Me.RowCount > 0 Then
         LibMemory.MemInt(LibMemory.ArrPtr(m_data) + 2) = F_STATIC
     End If
 End Sub
 Private Sub UnlockDataSizeIfNeeded()
-    If Me.RowsCount > 0 Then
+    If Me.RowCount > 0 Then
         Const FADF_HAVEVARTYPE As Long = &H80
         LibMemory.MemInt(LibMemory.ArrPtr(m_data) + 2) = FADF_HAVEVARTYPE
     End If
@@ -493,9 +493,9 @@ End Property
 '===============================================================================
 'Rows Count
 '===============================================================================
-Public Property Get RowsCount() As Long
+Public Property Get RowCount() As Long
     On Error Resume Next
-    RowsCount = UBound(m_data, 1) - LBound(m_data, 1) + 1
+    RowCount = UBound(m_data, 1) - LBound(m_data, 1) + 1
     On Error GoTo 0
 End Property
 
