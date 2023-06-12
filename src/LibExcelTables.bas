@@ -340,6 +340,7 @@ Public Sub SortListObjectIfNeeded(ByVal tbl As ListObject _
             needsSort = sortAsc
         ElseIf sortAsc Then
             needsSort = (prev > curr)
+            If needsSort Then needsSort = Not IsEmpty(curr)
         Else
             needsSort = (prev < curr)
         End If
