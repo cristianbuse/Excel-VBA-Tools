@@ -176,7 +176,7 @@ Public Sub WaitForCalculations(ByVal maxMilliSecondsToWait As Long)
     Dim remainingTriesToFixBug As Long: remainingTriesToFixBug = 3
     Dim tMax As Date: tMax = NowMs() + maxMilliSecondsToWait / msPerDay
     '
-    Do While Application.CalculationState <> xlDone
+    Do While Application.CalculationState <> xlDone Or Not Application.Ready
         DoEvents
         If NowMs() > tMax Then Exit Do
         If Application.CalculationState = xlPending Then
