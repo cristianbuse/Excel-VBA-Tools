@@ -102,7 +102,11 @@ Public Sub RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0)
             On Error GoTo 0
         End If
         If .DisplayAlerts Xor m_alertsOn Then .DisplayAlerts = m_alertsOn
-        If .PrintCommunication Xor m_printOn Then .PrintCommunication = m_printOn
+        If .PrintCommunication Xor m_printOn Then
+            On Error Resume Next
+            .PrintCommunication = m_printOn
+            On Error GoTo 0
+        End If
     End With
     m_hasStoredState = False
 End Sub
