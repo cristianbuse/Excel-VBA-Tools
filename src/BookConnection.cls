@@ -81,7 +81,14 @@ Public Function Connect(ByVal filePath As String _
                 wnd.WindowState = xlMinimized
             Next wnd
         End If
-        Connect = True
+        If m_book.readOnly Xor readOnly Then
+            If readOnly Then
+                m_book.ChangeFileAccess xlReadOnly
+            Else
+                m_book.ChangeFileAccess xlReadWrite
+            End If
+        End If
+        Connect = (m_book.readOnly = readOnly)
     End If
     On Error GoTo 0
 End Function
@@ -89,20 +96,25 @@ End Function
 '*******************************************************************************
 'Close the Workbook (if not already opened before 'Connect')
 '*******************************************************************************
-Public Sub Disconnect(Optional ByVal saveChanges As Boolean = False)
+Public Function Disconnect(Optional ByVal saveChanges As Boolean = False) As Boolean
     If m_book Is Nothing Then
         m_alreadyOpened = False
-        Exit Sub
+        Disconnect = False
+        Exit Function
     End If
-    If Not m_alreadyOpened Then
+    If m_alreadyOpened Then
+        Disconnect = True
+    Else
         On Error Resume Next
         m_book.Close saveChanges
+        Disconnect = (Err.Number = 0)
         On Error GoTo 0
     End If
-    '
-    Set m_book = Nothing
-    m_alreadyOpened = False
-End Sub
+    If Disconnect Then
+        Set m_book = Nothing
+        m_alreadyOpened = False
+    End If
+End Function
 
 '*******************************************************************************
 'Get self instance. Useful in 'With New ...' blocks
