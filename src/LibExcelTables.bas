@@ -159,14 +159,31 @@ Private Function AppendListRows(ByVal tbl As ListObject _
     If isProtected And tbl.ShowTotals Then
         Set rngToAppend = tbl.TotalsRowRange
     ElseIf isProtected Then
-        Set rngToAppend = AutoExpandOneRow(tbl)
+        Set rngToAppend = AutoExpandOneRow(tbl, doEntireSheetRow)
     Else
         Set rngToAppend = tbl.Range.Rows(tbl.Range.Rows.Count + 1)
     End If
     '
     Set rngToAppend = rngToAppend.Resize(RowSize:=rowsToAppend)
     If doEntireSheetRow Then Set rngToAppend = rngToAppend.EntireRow
+    '
+    If rowsToAppend > 1 Then On Error Resume Next 'In case another table is below
     rngToAppend.Insert xlShiftDown, xlFormatFromLeftOrAbove
+    If Err.Number <> 0 Then
+        On Error GoTo ErrorHandler
+        '
+        Dim rLeft As Long: rLeft = rowsToAppend
+        Dim cRows As Long: cRows = 1
+        '
+        Do While rLeft > 0
+            rngToAppend.Resize(cRows).Insert xlShiftDown, xlFormatFromLeftOrAbove
+            Set rngToAppend = rngToAppend.Offset(-cRows)
+            '
+            rLeft = rLeft - cRows
+            cRows = cRows * 2
+            If cRows > rLeft Then cRows = rLeft
+        Loop
+    End If
     '
     If isProtected And tbl.ShowTotals Then 'Fix formatting
         tbl.ListRows(1).Range.Copy
@@ -174,7 +191,9 @@ Private Function AppendListRows(ByVal tbl As ListObject _
             .Resize(RowSize:=rowsToAppend).PasteSpecial xlPasteFormats
         End With
     ElseIf isProtected Then 'Delete the autoExpand row
-        tbl.ListRows(tbl.ListRows.Count).Range.Delete xlShiftUp
+        Dim rng As Range: Set rng = tbl.ListRows(tbl.ListRows.Count).Range
+        If doEntireSheetRow Then Set rng = rng.EntireRow
+        rng.Delete xlShiftUp
     Else 'Resize table
         tbl.Resize tbl.Range.Resize(tbl.Range.Rows.Count + rowsToAppend)
     End If
@@ -206,7 +225,8 @@ End Function
 'Utility for 'AppendListRows' method
 'Adds one row via auto expand if the worksheet is protected and totals are off
 '*******************************************************************************
-Private Function AutoExpandOneRow(ByVal tbl As ListObject) As Range
+Private Function AutoExpandOneRow(ByVal tbl As ListObject _
+                                , ByVal doEntireSheetRow As Boolean) As Range
     If Not tbl.Parent.ProtectContents Then Exit Function
     If tbl.ShowTotals Then Exit Function
     '
@@ -215,7 +235,11 @@ Private Function AutoExpandOneRow(ByVal tbl As ListObject) As Range
     Dim tempRow As Range: Set tempRow = tbl.Range.Rows(tbl.Range.Rows.Count + 1)
     '
     If Not isAutoExpand Then ac.AutoExpandListRange = True
-    tempRow.Insert xlShiftDown, xlFormatFromLeftOrAbove
+    If doEntireSheetRow Then
+        tempRow.EntireRow.Insert xlShiftDown, xlFormatFromLeftOrAbove
+    Else
+        tempRow.Insert xlShiftDown, xlFormatFromLeftOrAbove
+    End If
     Set AutoExpandOneRow = tempRow.Offset(-1, 0)
     Const arbitraryValue As Long = 1 'Must not be Empty/Null/""
     AutoExpandOneRow.Value2 = arbitraryValue 'AutoExpand is triggered
