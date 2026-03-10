@@ -98,7 +98,7 @@ End Function
 Private Sub UnfilterIfNeeded(ByVal tbl As ListObject)
     On Error Resume Next
     If IsListObjectFiltered(tbl) Then tbl.AutoFilter.ShowAllData
-    If tbl.Parent.AutoFilterMode Then tbl.Parent.AutoFilter.ShowAllData
+    If tbl.Parent.FilterMode Then tbl.Parent.AutoFilter.ShowAllData
     On Error GoTo 0
 End Sub
 
