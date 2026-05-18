@@ -49,6 +49,8 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+Private Const msPerDay As Long = 24& * 60& * 60& * 1000& 'Milliseconds
+
 Private m_eventOn As Boolean
 Private m_calcMode As XlCalculation
 Private m_repaintOn As Boolean
@@ -88,10 +90,14 @@ End Sub
 '*******************************************************************************
 'Restore the previously saved application settings
 '*******************************************************************************
-Public Sub RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0)
+Public Function RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0) As Boolean
     If Not m_hasStoredState Then
         Err.Raise 5, TypeName(Me) & ".RestoreState", "Nothing to restore"
+    ElseIf Not WaitForReadyIfNeeded(maxMilliSecondsToWait) Then
+        Exit Function
     End If
+    On Error GoTo ErrorHandler
+    '
     With Application
         If .EnableEvents Xor m_eventOn Then .EnableEvents = m_eventOn
         If .ScreenUpdating Xor m_repaintOn Then .ScreenUpdating = m_repaintOn
@@ -99,7 +105,7 @@ Public Sub RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0)
             On Error Resume Next
             If .Calculation <> m_calcMode Then .Calculation = m_calcMode
             If Err.Number = 0 Then WaitForCalculations maxMilliSecondsToWait
-            On Error GoTo 0
+            On Error GoTo ErrorHandler
         End If
         If .DisplayAlerts Xor m_alertsOn Then .DisplayAlerts = m_alertsOn
         If .PrintCommunication Xor m_printOn Then
@@ -109,7 +115,26 @@ Public Sub RestoreState(Optional ByVal maxMilliSecondsToWait As Long = 0)
         End If
     End With
     m_hasStoredState = False
-End Sub
+    RestoreState = True
+Exit Function
+ErrorHandler:
+End Function
+
+'*******************************************************************************
+'Utility function to avoid error 50290
+'*******************************************************************************
+Private Function WaitForReadyIfNeeded(ByRef maxMsToWait As Long) As Boolean
+    Do While Not Application.Ready
+        Dim tMax As Date
+        '
+        If tMax = 0 Then tMax = NowMs() + maxMsToWait / msPerDay
+        DoEvents
+        '
+        maxMsToWait = CLng((tMax - NowMs()) * msPerDay)
+        If maxMsToWait <= 0 Then Exit Do
+    Loop
+    WaitForReadyIfNeeded = Application.Ready
+End Function
 
 '*******************************************************************************
 'Clear the previously saved application settings
@@ -121,11 +146,15 @@ End Sub
 '*******************************************************************************
 'Put App to sleep. Speeds up code execution for certain interactions with app
 '*******************************************************************************
-Public Sub Sleep(Optional ByVal eventsOn As Boolean = False _
-               , Optional ByVal calcMode As XlCalculation = xlCalculationManual _
-               , Optional ByVal repaintOn As Boolean = False _
-               , Optional ByVal alertsOn As Boolean = False _
-               , Optional ByVal printOn As Boolean = False)
+Public Function Sleep(Optional ByVal maxMilliSecondsToWait As Long = 0 _
+                    , Optional ByVal eventsOn As Boolean = False _
+                    , Optional ByVal calcMode As XlCalculation = xlCalculationManual _
+                    , Optional ByVal repaintOn As Boolean = False _
+                    , Optional ByVal alertsOn As Boolean = False _
+                    , Optional ByVal printOn As Boolean = False) As Boolean
+    If Not WaitForReadyIfNeeded(maxMilliSecondsToWait) Then Exit Function
+    On Error GoTo ErrorHandler
+    '
     Select Case calcMode
     Case xlCalculationAutomatic, xlCalculationSemiautomatic, xlCalculationManual
     Case Else
@@ -135,22 +164,28 @@ Public Sub Sleep(Optional ByVal eventsOn As Boolean = False _
         If .EnableEvents Xor eventsOn Then .EnableEvents = eventsOn
         On Error Resume Next
         If .Calculation <> calcMode Then .Calculation = calcMode
-        On Error GoTo 0
+        On Error GoTo ErrorHandler
         If .ScreenUpdating Xor repaintOn Then .ScreenUpdating = repaintOn
         If .DisplayAlerts Xor alertsOn Then .DisplayAlerts = alertsOn
         If .PrintCommunication Xor printOn Then .PrintCommunication = printOn
     End With
-End Sub
+    Sleep = True
+Exit Function
+ErrorHandler:
+End Function
 
 '*******************************************************************************
 'Set Application to Normal working mode
 '*******************************************************************************
-Public Sub Wake(Optional ByVal maxMilliSecondsToWait As Long = 0 _
-              , Optional ByVal eventsOn As Boolean = True _
-              , Optional ByVal calcMode As XlCalculation = xlCalculationAutomatic _
-              , Optional ByVal repaintOn As Boolean = True _
-              , Optional ByVal alertsOn As Boolean = True _
-              , Optional ByVal printOn As Boolean = True)
+Public Function Wake(Optional ByVal maxMilliSecondsToWait As Long = 0 _
+                   , Optional ByVal eventsOn As Boolean = True _
+                   , Optional ByVal calcMode As XlCalculation = xlCalculationAutomatic _
+                   , Optional ByVal repaintOn As Boolean = True _
+                   , Optional ByVal alertsOn As Boolean = True _
+                   , Optional ByVal printOn As Boolean = True) As Boolean
+    If Not WaitForReadyIfNeeded(maxMilliSecondsToWait) Then Exit Function
+    On Error GoTo ErrorHandler
+    '
     Select Case calcMode
     Case xlCalculationAutomatic, xlCalculationSemiautomatic, xlCalculationManual
     Case Else
@@ -162,11 +197,14 @@ Public Sub Wake(Optional ByVal maxMilliSecondsToWait As Long = 0 _
         On Error Resume Next
         If .Calculation <> calcMode Then .Calculation = calcMode
         If Err.Number = 0 Then WaitForCalculations maxMilliSecondsToWait
-        On Error GoTo 0
+        On Error GoTo ErrorHandler
         If .DisplayAlerts Xor alertsOn Then .DisplayAlerts = alertsOn
         If .PrintCommunication Xor printOn Then .PrintCommunication = printOn
     End With
-End Sub
+    Wake = True
+Exit Function
+ErrorHandler:
+End Function
 
 '*******************************************************************************
 'Wait for the application to finish calculations
@@ -176,7 +214,6 @@ Public Sub WaitForCalculations(ByVal maxMilliSecondsToWait As Long)
     If maxMilliSecondsToWait <= 0 Then Exit Sub
     If UDFMode() Then Exit Sub 'Code running from a UDF in a range/named range
     '
-    Const msPerDay As Long = 24& * 60& * 60& * 1000&
     Dim remainingTriesToFixBug As Long: remainingTriesToFixBug = 3
     Dim tMax As Date: tMax = NowMs() + maxMilliSecondsToWait / msPerDay
     '
