@@ -76,19 +76,23 @@ Public Function Connect(ByVal filePath As String _
                               , password:=password)
     If Not m_book Is Nothing Then
         m_alreadyOpened = (bookCount = Workbooks.Count)
-        If Not m_alreadyOpened And minimizeNewlyOpened Then
-            For Each wnd In m_book.Windows
-                wnd.WindowState = xlMinimized
-            Next wnd
-        End If
-        If m_book.readOnly Xor readOnly Then
-            If readOnly Then
-                m_book.ChangeFileAccess xlReadOnly
-            Else
-                m_book.ChangeFileAccess xlReadWrite
+        If m_alreadyOpened Then
+            Connect = True
+        Else
+            If minimizeNewlyOpened Then
+                For Each wnd In m_book.Windows
+                    wnd.WindowState = xlMinimized
+                Next wnd
             End If
+            If m_book.readOnly Xor readOnly Then
+                If readOnly Then
+                    m_book.ChangeFileAccess xlReadOnly
+                Else
+                    m_book.ChangeFileAccess xlReadWrite
+                End If
+            End If
+            Connect = (m_book.readOnly = readOnly)
         End If
-        Connect = (m_book.readOnly = readOnly)
     End If
     On Error GoTo 0
 End Function
